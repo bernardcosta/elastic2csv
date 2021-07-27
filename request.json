@@ -1,0 +1,268 @@
+{
+  "aggs": {
+    "2": {
+      "composite": {
+        "size": 700,
+        "sources": [
+          {
+            "urls": {
+              "terms": {
+                "field": "user.session.first.url.keyword"
+              }
+            }
+          }
+        ]
+      },
+      "aggs": {
+        "3": {
+          "sum_bucket": {
+            "buckets_path": "3-bucket>3-metric"
+          }
+        },
+        "4": {
+          "sum_bucket": {
+            "buckets_path": "4-bucket>_count"
+          }
+        },
+        "2-orderAgg": {
+          "sum": {
+            "field": "event.connection.realValue"
+          }
+        },
+        "3-bucket": {
+          "filters": {
+            "filters": {
+              "pageType.keyword:ThankYou": {
+                "bool": {
+                  "must": [],
+                  "filter": [
+                    {
+                      "bool": {
+                        "should": [
+                          {
+                            "match": {
+                              "pageType.keyword": "ThankYou"
+                            }
+                          }
+                        ],
+                        "minimum_should_match": 1
+                      }
+                    }
+                  ],
+                  "should": [],
+                  "must_not": []
+                }
+              }
+            }
+          },
+          "aggs": {
+            "3-metric": {
+              "sum": {
+                "field": "event.connection.realValue"
+              }
+            }
+          }
+        },
+        "4-bucket": {
+          "filters": {
+            "filters": {
+              "user.session.first.pageType:Index OR user.session.first.pageType:TransportRoute OR user.session.first.pageType:TransportCity": {
+                "bool": {
+                  "must": [],
+                  "filter": [
+                    {
+                      "bool": {
+                        "should": [
+                          {
+                            "bool": {
+                              "should": [
+                                {
+                                  "match": {
+                                    "user.session.first.pageType": "Index"
+                                  }
+                                }
+                              ],
+                              "minimum_should_match": 1
+                            }
+                          },
+                          {
+                            "bool": {
+                              "should": [
+                                {
+                                  "bool": {
+                                    "should": [
+                                      {
+                                        "match": {
+                                          "user.session.first.pageType": "TransportRoute"
+                                        }
+                                      }
+                                    ],
+                                    "minimum_should_match": 1
+                                  }
+                                },
+                                {
+                                  "bool": {
+                                    "should": [
+                                      {
+                                        "match": {
+                                          "user.session.first.pageType": "TransportCity"
+                                        }
+                                      }
+                                    ],
+                                    "minimum_should_match": 1
+                                  }
+                                }
+                              ],
+                              "minimum_should_match": 1
+                            }
+                          }
+                        ],
+                        "minimum_should_match": 1
+                      }
+                    }
+                  ],
+                  "should": [],
+                  "must_not": []
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "size": 0,
+  "fields": [
+    {
+      "field": "@date",
+      "format": "date_time"
+    },
+    {
+      "field": "@timestamp",
+      "format": "date_time"
+    },
+    {
+      "field": "event.connection.fromDate",
+      "format": "date_time"
+    },
+    {
+      "field": "event.search.@timestamp",
+      "format": "date_time"
+    },
+    {
+      "field": "event.search.dates.from",
+      "format": "date_time"
+    },
+    {
+      "field": "event.search.dates.to",
+      "format": "date_time"
+    },
+    {
+      "field": "event.search.startTime",
+      "format": "date_time"
+    },
+    {
+      "field": "eventData.date",
+      "format": "date_time"
+    },
+    {
+      "field": "ext_report.action_date",
+      "format": "date_time"
+    },
+    {
+      "field": "qs.checkin",
+      "format": "date_time"
+    },
+    {
+      "field": "qs.checkout",
+      "format": "date_time"
+    },
+    {
+      "field": "ts",
+      "format": "date_time"
+    },
+    {
+      "field": "user.session.first.event.connection.fromDate",
+      "format": "date_time"
+    },
+    {
+      "field": "user.session.first.event.search.@timestamp",
+      "format": "date_time"
+    },
+    {
+      "field": "user.session.first.event.search.dates.from",
+      "format": "date_time"
+    },
+    {
+      "field": "user.session.first.event.search.dates.to",
+      "format": "date_time"
+    },
+    {
+      "field": "user.session.first.event.search.startTime",
+      "format": "date_time"
+    },
+    {
+      "field": "user.session.first.qs.checkin",
+      "format": "date_time"
+    },
+    {
+      "field": "user.session.first.qs.checkout",
+      "format": "date_time"
+    }
+  ],
+  "script_fields": {},
+  "stored_fields": [
+    "*"
+  ],
+  "_source": {
+    "excludes": []
+  },
+  "query": {
+    "bool": {
+      "must": [],
+      "filter": [
+        {
+          "match_all": {}
+        },
+        {
+          "bool": {
+            "should": [
+              {
+                "match_phrase": {
+                  "tld.keyword": "my"
+                }
+              },
+              {
+                "match_phrase": {
+                  "tld.keyword": "sg"
+                }
+              },
+              {
+                "match_phrase": {
+                  "tld.keyword": "pt"
+                }
+              }
+            ],
+            "minimum_should_match": 1
+          }
+        },
+        {
+          "match_phrase": {
+            "user.session.first.trafficType.keyword": "seo"
+          }
+        },
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "2020-01-23T08:04:38.334Z",
+              "lte": "2021-07-23T07:04:38.335Z",
+              "format": "strict_date_optional_time"
+            }
+          }
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  }
+}
