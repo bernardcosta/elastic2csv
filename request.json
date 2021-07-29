@@ -1,6 +1,6 @@
 {
   "aggs": {
-    "2": {
+    "two": {
       "composite": {
         "size": 700,
         "sources": [
@@ -14,71 +14,37 @@
         ]
       },
       "aggs": {
-        "3": {
+        "one": {
           "sum_bucket": {
-            "buckets_path": "3-bucket>3-metric"
+            "buckets_path": "one-bucket>_count"
           }
         },
-        "4": {
+        "three": {
           "sum_bucket": {
-            "buckets_path": "4-bucket>_count"
+            "buckets_path": "three-bucket>three-metric"
           }
         },
-        "2-orderAgg": {
+        "two-orderAgg": {
           "sum": {
             "field": "event.connection.realValue"
           }
         },
-        "3-bucket": {
+        "one-bucket": {
           "filters": {
             "filters": {
-              "pageType.keyword:ThankYou": {
+              "user.session.trafficType.keyword:seo and pageType:(TransportRoute or Index or TransportCity) and user.session.pages:1": {
                 "bool": {
                   "must": [],
                   "filter": [
                     {
                       "bool": {
-                        "should": [
-                          {
-                            "match": {
-                              "pageType.keyword": "ThankYou"
-                            }
-                          }
-                        ],
-                        "minimum_should_match": 1
-                      }
-                    }
-                  ],
-                  "should": [],
-                  "must_not": []
-                }
-              }
-            }
-          },
-          "aggs": {
-            "3-metric": {
-              "sum": {
-                "field": "event.connection.realValue"
-              }
-            }
-          }
-        },
-        "4-bucket": {
-          "filters": {
-            "filters": {
-              "user.session.first.pageType:Index OR user.session.first.pageType:TransportRoute OR user.session.first.pageType:TransportCity": {
-                "bool": {
-                  "must": [],
-                  "filter": [
-                    {
-                      "bool": {
-                        "should": [
+                        "filter": [
                           {
                             "bool": {
                               "should": [
                                 {
                                   "match": {
-                                    "user.session.first.pageType": "Index"
+                                    "user.session.trafficType.keyword": "seo"
                                   }
                                 }
                               ],
@@ -87,13 +53,51 @@
                           },
                           {
                             "bool": {
-                              "should": [
+                              "filter": [
                                 {
                                   "bool": {
                                     "should": [
                                       {
-                                        "match": {
-                                          "user.session.first.pageType": "TransportRoute"
+                                        "bool": {
+                                          "should": [
+                                            {
+                                              "match": {
+                                                "pageType": "TransportRoute"
+                                              }
+                                            }
+                                          ],
+                                          "minimum_should_match": 1
+                                        }
+                                      },
+                                      {
+                                        "bool": {
+                                          "should": [
+                                            {
+                                              "bool": {
+                                                "should": [
+                                                  {
+                                                    "match": {
+                                                      "pageType": "Index"
+                                                    }
+                                                  }
+                                                ],
+                                                "minimum_should_match": 1
+                                              }
+                                            },
+                                            {
+                                              "bool": {
+                                                "should": [
+                                                  {
+                                                    "match": {
+                                                      "pageType": "TransportCity"
+                                                    }
+                                                  }
+                                                ],
+                                                "minimum_should_match": 1
+                                              }
+                                            }
+                                          ],
+                                          "minimum_should_match": 1
                                         }
                                       }
                                     ],
@@ -105,25 +109,75 @@
                                     "should": [
                                       {
                                         "match": {
-                                          "user.session.first.pageType": "TransportCity"
+                                          "user.session.pages": 1
                                         }
                                       }
                                     ],
                                     "minimum_should_match": 1
                                   }
                                 }
-                              ],
-                              "minimum_should_match": 1
+                              ]
                             }
                           }
-                        ],
-                        "minimum_should_match": 1
+                        ]
                       }
                     }
                   ],
                   "should": [],
                   "must_not": []
                 }
+              }
+            }
+          }
+        },
+        "three-bucket": {
+          "filters": {
+            "filters": {
+              "pageType.keyword:ThankYou and user.session.trafficType.keyword:seo": {
+                "bool": {
+                  "must": [],
+                  "filter": [
+                    {
+                      "bool": {
+                        "filter": [
+                          {
+                            "bool": {
+                              "should": [
+                                {
+                                  "match": {
+                                    "pageType.keyword": "ThankYou"
+                                  }
+                                }
+                              ],
+                              "minimum_should_match": 1
+                            }
+                          },
+                          {
+                            "bool": {
+                              "should": [
+                                {
+                                  "match": {
+                                    "user.session.trafficType.keyword": "seo"
+                                  }
+                                }
+                              ],
+                              "minimum_should_match": 1
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  ],
+                  "should": [],
+                  "must_not": []
+                }
+              }
+            }
+          },
+          "aggs": {
+            "three-metric": {
+              "sum": {
+                "field": "event.connection.realValue"
               }
             }
           }

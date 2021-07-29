@@ -12,8 +12,7 @@ def get_keys(dictionary):
 def key_exists(keys):
     if 'composite' not in keys:
         raise KeyError('"Composite" key must be in query.')
-    else:
-        print(keys)
+
 
 if __name__ == "__main__":
 
@@ -24,10 +23,14 @@ if __name__ == "__main__":
 
     key_exists([key for key in get_keys(query)])
 
+    full_buckets = []
 
-    # while True:
-    #     res = es.search(index="tracking-*", body=query)
-    #     print(res['aggregations']['2']['after_key']['urls'])
-    #     after_url = "res['aggregations']['2']['after_key']['urls']"
-    #     after_dict = {"urls":after_url}
-    #     query['aggs']['2']["composite"]["after"] = after_url
+    while True:
+        res = es.search(index="tracking-*", body=query)
+        full_buckets.extend(res['aggregations']['two']['buckets'])
+        print(res['aggregations']['two']['after_key']['urls'])
+        after_dict = {"urls":res['aggregations']['two']['after_key']['urls']}
+        query['aggs']['two']["composite"]["after"] = after_dict
+
+    with open('results.json', 'w') as fout:
+    json.dump(full_buckets, fout)
