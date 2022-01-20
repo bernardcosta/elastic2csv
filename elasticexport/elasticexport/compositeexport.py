@@ -1,5 +1,6 @@
 from elasticsearch import Elasticsearch
 import json
+import os
 
 
 def get_keys(dictionary):
@@ -15,8 +16,7 @@ def key_exists(keys):
 
 
 if __name__ == "__main__":
-
-    es = Elasticsearch(['http://78.46.91.54:9200'])
+    es = Elasticsearch([os.environ['BISERVER']])
 
     with open('request.json', encoding='utf-8') as f:
         query = json.loads(f.read())
@@ -26,7 +26,7 @@ if __name__ == "__main__":
     full_buckets = []
 
     while True:
-        res = es.search(index="tracking-*", body=query)
+        res = es.search(index=os.environ['INDEX'], body=query)
         full_buckets.extend(res['aggregations']['two']['buckets'])
         if "after_key" not in res['aggregations']['two']:
             break
