@@ -3,8 +3,8 @@ services:
     container_name: elasticexport
     build: .
     volumes:
-      - ./elasticexport/elasticexport/:/usr/src/elasticexport/elasticexport
+      - ./elasticexport:/usr/src/elasticexport
     env_file:
       - .env
-    working_dir: /usr/src/elasticexport/elasticexport
-    command: python compositeexport.py
+    working_dir: /usr/src/elasticexport
+    command: python ./core/compositeexport.py
