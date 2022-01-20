@@ -14,157 +14,28 @@
         ]
       },
       "aggs": {
-        "one": {
-          "sum_bucket": {
-            "buckets_path": "one-bucket>_count"
-          }
-        },
         "three": {
           "sum_bucket": {
             "buckets_path": "three-bucket>three-metric"
           }
         },
-        "two-orderAgg": {
-          "sum": {
-            "field": "event.connection.realValue"
-          }
-        },
-        "one-bucket": {
-          "filters": {
-            "filters": {
-              "user.session.trafficType.keyword:seo and pageType:(TransportRoute or Index or TransportCity) and user.session.pages:1": {
-                "bool": {
-                  "must": [],
-                  "filter": [
-                    {
-                      "bool": {
-                        "filter": [
-                          {
-                            "bool": {
-                              "should": [
-                                {
-                                  "match": {
-                                    "user.session.trafficType.keyword": "seo"
-                                  }
-                                }
-                              ],
-                              "minimum_should_match": 1
-                            }
-                          },
-                          {
-                            "bool": {
-                              "filter": [
-                                {
-                                  "bool": {
-                                    "should": [
-                                      {
-                                        "bool": {
-                                          "should": [
-                                            {
-                                              "match": {
-                                                "pageType": "TransportRoute"
-                                              }
-                                            }
-                                          ],
-                                          "minimum_should_match": 1
-                                        }
-                                      },
-                                      {
-                                        "bool": {
-                                          "should": [
-                                            {
-                                              "bool": {
-                                                "should": [
-                                                  {
-                                                    "match": {
-                                                      "pageType": "Index"
-                                                    }
-                                                  }
-                                                ],
-                                                "minimum_should_match": 1
-                                              }
-                                            },
-                                            {
-                                              "bool": {
-                                                "should": [
-                                                  {
-                                                    "match": {
-                                                      "pageType": "TransportCity"
-                                                    }
-                                                  }
-                                                ],
-                                                "minimum_should_match": 1
-                                              }
-                                            }
-                                          ],
-                                          "minimum_should_match": 1
-                                        }
-                                      }
-                                    ],
-                                    "minimum_should_match": 1
-                                  }
-                                },
-                                {
-                                  "bool": {
-                                    "should": [
-                                      {
-                                        "match": {
-                                          "user.session.pages": 1
-                                        }
-                                      }
-                                    ],
-                                    "minimum_should_match": 1
-                                  }
-                                }
-                              ]
-                            }
-                          }
-                        ]
-                      }
-                    }
-                  ],
-                  "should": [],
-                  "must_not": []
-                }
-              }
-            }
-          }
-        },
         "three-bucket": {
           "filters": {
             "filters": {
-              "pageType.keyword:ThankYou and user.session.trafficType.keyword:seo": {
+              "pageType:ThankYou": {
                 "bool": {
                   "must": [],
                   "filter": [
                     {
                       "bool": {
-                        "filter": [
+                        "should": [
                           {
-                            "bool": {
-                              "should": [
-                                {
-                                  "match": {
-                                    "pageType.keyword": "ThankYou"
-                                  }
-                                }
-                              ],
-                              "minimum_should_match": 1
-                            }
-                          },
-                          {
-                            "bool": {
-                              "should": [
-                                {
-                                  "match": {
-                                    "user.session.trafficType.keyword": "seo"
-                                  }
-                                }
-                              ],
-                              "minimum_should_match": 1
+                            "match": {
+                              "pageType": "ThankYou"
                             }
                           }
-                        ]
+                        ],
+                        "minimum_should_match": 1
                       }
                     }
                   ],
@@ -232,6 +103,10 @@
       "format": "date_time"
     },
     {
+      "field": "qs.d.date",
+      "format": "date_time"
+    },
+    {
       "field": "ts",
       "format": "date_time"
     },
@@ -279,21 +154,36 @@
           "match_all": {}
         },
         {
+          "match_phrase": {
+            "tld.keyword": "pt"
+          }
+        },
+        {
           "bool": {
             "should": [
               {
                 "match_phrase": {
-                  "tld.keyword": "my"
+                  "user.session.first.pageType.keyword": "TransportRoute"
                 }
               },
               {
                 "match_phrase": {
-                  "tld.keyword": "sg"
+                  "user.session.first.pageType.keyword": "TransportCity"
                 }
               },
               {
                 "match_phrase": {
-                  "tld.keyword": "pt"
+                  "user.session.first.pageType.keyword": "Index"
+                }
+              },
+              {
+                "match_phrase": {
+                  "user.session.first.pageType.keyword": "page"
+                }
+              },
+              {
+                "match_phrase": {
+                  "user.session.first.pageType.keyword": "pixel::autocomplete"
                 }
               }
             ],
@@ -301,15 +191,10 @@
           }
         },
         {
-          "match_phrase": {
-            "user.session.first.trafficType.keyword": "seo"
-          }
-        },
-        {
           "range": {
             "@timestamp": {
-              "gte": "2020-01-23T08:04:38.334Z",
-              "lte": "2021-07-23T07:04:38.335Z",
+              "gte": "2020-01-01T01:00:00.000Z",
+              "lte": "2021-08-18T09:57:30.559Z",
               "format": "strict_date_optional_time"
             }
           }

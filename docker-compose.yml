@@ -1,0 +1,6 @@
+services:
+  python:
+    container_name: elasticexport
+    build: .
+    volumes:
+      - ./elasticexport/elasticexport/:/usr/src/app/elasticexport

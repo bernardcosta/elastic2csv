@@ -28,9 +28,11 @@ if __name__ == "__main__":
     while True:
         res = es.search(index="tracking-*", body=query)
         full_buckets.extend(res['aggregations']['two']['buckets'])
+        if "after_key" not in res['aggregations']['two']:
+            break
         print(res['aggregations']['two']['after_key']['urls'])
         after_dict = {"urls":res['aggregations']['two']['after_key']['urls']}
         query['aggs']['two']["composite"]["after"] = after_dict
 
     with open('results.json', 'w') as fout:
-    json.dump(full_buckets, fout)
+        json.dump(full_buckets, fout)
