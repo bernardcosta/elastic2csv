@@ -1,6 +1,6 @@
 from elasticsearch import Elasticsearch
 import json
-import os
+import os, shutil
 from datetime import datetime
 import logging
 import sys
@@ -16,8 +16,6 @@ def mkdir(rel_path):
       log.info(f'New Directory Created: {rel_path}')
     else:
         log.info(f'Path already exists. Will overwrite output')
-
-
 
 if __name__ == "__main__":
 
@@ -47,5 +45,7 @@ if __name__ == "__main__":
 
                 after_dict = {"urls":res['aggregations']['two']['after_key']['urls']}
                 query['aggs']['two']["composite"]["after"] = after_dict
+                break
+        shutil.copy(os.path.join(output_path,'dump.json'), 'tmp_dump.json')
     except Exception as e:
-        log.exception()
+        log.exception("compositeexport.py")
