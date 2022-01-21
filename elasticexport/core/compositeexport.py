@@ -3,7 +3,9 @@ import json
 import os
 from datetime import datetime
 import logging
+import sys
 log = logging.getLogger(__name__)
+
 # def get_keys(dictionary):
 #     for key, value in dictionary.items():
 #         yield key
@@ -17,12 +19,15 @@ log = logging.getLogger(__name__)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(filename=f'std.log', level=logging.INFO, filemode='w', format='[%(asctime)s-%(levelname)s] %(name)s: %(message)s')
+
+    logging.basicConfig(filename=f'std.log', level=logging.DEBUG, filemode='w', format='[%(asctime)s-%(levelname)s] %(name)s: %(message)s')
     log.debug(f'Starting export')
+    log.debug(sys.argv[1])
+    log.debug(len(sys.argv))
     try:
-        es = Elasticsearch([os.environ['BISERVER']])
+        es = Elasticsearch([f'{os.environ["LOCALHOST"]}:5601'])
         log.debug("Connected to elasticsearch server")
-        with open('new_request.json', encoding='utf-8') as f:
+        with open(str(sys.argv[1]), encoding='utf-8') as f:
             query = json.loads(f.read())
 
         # key_exists([key for key in get_keys(query)])

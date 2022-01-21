@@ -7,4 +7,4 @@ services:
     env_file:
       - .env
     working_dir: /usr/src/elasticexport
-    command: python ./core/compositeexport.py
+    command: python ./core/compositeexport.py request.json
