@@ -38,9 +38,9 @@ if __name__ == "__main__":
 
         with open(os.path.join(output_path,'dump.json'), 'a+') as out:
             while True:
-                res = es.search(index=str(os.environ['INDEX']), body=query)
-                
-                out.write(str(res['aggregations']['two']['buckets']))
+                res = es.search(index=str(os.environ['INDEX']), body=query, headers={"accept": "application/vnd.elasticsearch+json; compatible-with=7"})
+
+                out.write(json.dumps(res['aggregations']['two']['buckets']))
                 out.write("\n")
                 if "after_key" not in res['aggregations']['two']:
                     break
