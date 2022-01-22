@@ -45,7 +45,6 @@ if __name__ == "__main__":
 
                 after_dict = {"urls":res['aggregations']['two']['after_key']['urls']}
                 query['aggs']['two']["composite"]["after"] = after_dict
-                break
         shutil.copy(os.path.join(output_path,'dump.json'), 'tmp_dump.json')
     except Exception as e:
         log.exception("compositeexport.py")
