@@ -19,9 +19,9 @@ def mkdir(rel_path):
 
 
 def dump_response(es_instance, query, output_file):
-    with open(os.path.join(output_file,'dump.json'), 'a+') as out:
+    with open(os.path.join(output_file,f'dump{str(datetime.now()).replace(" ","")}.json'), 'a+') as out:
         while True:
-            res = es_instance.search(index=str(os.environ['INDEX']), body=query, headers={"accept": "application/vnd.elasticsearch+json; compatible-with=7"})
+            res = es_instance.search(index=str(os.environ['INDEX']), body=query)
 
             out.write(json.dumps(res['aggregations']['two']['buckets']))
             out.write("\n")
@@ -30,7 +30,7 @@ def dump_response(es_instance, query, output_file):
 
             after_dict = {"urls":res['aggregations']['two']['after_key']['urls']}
             query['aggs']['two']["composite"]["after"] = after_dict
-
+            break
 def load_request():
     with open(str(sys.argv[1]), encoding='utf-8') as f:
         request = json.loads(f.read())
@@ -46,18 +46,17 @@ if __name__ == "__main__":
     log.info(len(sys.argv))
 
     try:
-        output_path = os.path.join("out",f"{sys.argv[2]}-{str(datetime.now()).replace(' ','')}")
-        mkdir(output_path)
+        mkdir("out")
 
-        es = Elasticsearch([os.environ["PFBISERVER"]])
+        es = Elasticsearch([os.environ["ESSERVER"]])
         log.info("Connected to elasticsearch server")
         log.info(str(sys.argv[1]))
 
         req = load_request()
 
-        dump_response(es, req, output_path)
+        dump_response(es, req, "out")
         # make a copy to root directory for further pipeline manipulation
-        shutil.copy(os.path.join(output_path,'dump.json'), 'tmp_dump.json')
+        shutil.copy(os.path.join("out",'dump.json'), 'tmp_dump.json')
 
     except Exception as e:
         log.exception("compositeexport.py")

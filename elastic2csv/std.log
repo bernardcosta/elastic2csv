@@ -1,0 +1,17 @@
+[2022-01-22 15:23:09,459-INFO] __main__: Starting export
+[2022-01-22 15:23:09,460-INFO] __main__: request.json
+[2022-01-22 15:23:09,462-INFO] __main__: 2
+[2022-01-22 15:23:09,464-INFO] __main__: Path already exists. Will overwrite output
+[2022-01-22 15:23:09,465-INFO] __main__: Connected to elasticsearch server
+[2022-01-22 15:23:09,466-INFO] __main__: request.json
+[2022-01-22 15:23:09,472-INFO] __main__: Reading request file
+[2022-01-22 15:23:11,388-INFO] elasticsearch: POST http://host.docker.internal:9201/tracking-*/_search [status:200 request:1.910s]
+[2022-01-22 15:23:11,405-ERROR] __main__: compositeexport.py
+Traceback (most recent call last):
+  File "./core/compositeexport.py", line 59, in <module>
+    shutil.copy(os.path.join("out",'dump.json'), 'tmp_dump.json')
+  File "/usr/local/lib/python3.7/shutil.py", line 248, in copy
+    copyfile(src, dst, follow_symlinks=follow_symlinks)
+  File "/usr/local/lib/python3.7/shutil.py", line 120, in copyfile
+    with open(src, 'rb') as fsrc:
+FileNotFoundError: [Errno 2] No such file or directory: 'out/dump.json'
