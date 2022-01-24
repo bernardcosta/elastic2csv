@@ -3,8 +3,9 @@ services:
     container_name: elastic2csv
     build: .
     volumes:
+      - ./run:/usr/src/run
       - ./elastic2csv:/usr/src/elastic2csv
     env_file:
       - .env
     working_dir: /usr/src/elastic2csv
-    command: python ./core/compositeexport.py request.json
+    command: sh ../run/new.sh

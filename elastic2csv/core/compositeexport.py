@@ -6,6 +6,7 @@ import logging
 import sys
 import traceback
 log = logging.getLogger(__name__)
+from dotenv import load_dotenv
 
 
 def mkdir(rel_path):
@@ -18,10 +19,11 @@ def mkdir(rel_path):
         log.info(f'Path already exists. Will overwrite output')
 
 
-def dump_response(es_instance, query, output_file):
-    with open(os.path.join(output_file,f'dump{str(datetime.now()).replace(" ","")}.json'), 'a+') as out:
+def dump_response(es_instance, query, out_dir):
+    outfile = os.path.join(out_dir,f'dump{str(datetime.now()).replace(" ","")}.json')
+    with open(outfile, 'a+') as out:
         while True:
-            res = es_instance.search(index=str(os.environ['INDEX']), body=query)
+            res = es_instance.search(index=str(os.environ['INDEX']), query=query["query"], aggs=query["aggs"])
 
             out.write(json.dumps(res['aggregations']['two']['buckets']))
             out.write("\n")
@@ -31,6 +33,8 @@ def dump_response(es_instance, query, output_file):
             after_dict = {"urls":res['aggregations']['two']['after_key']['urls']}
             query['aggs']['two']["composite"]["after"] = after_dict
             break
+    return outfile
+
 def load_request():
     with open(str(sys.argv[1]), encoding='utf-8') as f:
         request = json.loads(f.read())
@@ -39,7 +43,7 @@ def load_request():
 
 
 if __name__ == "__main__":
-
+    load_dotenv()
     logging.basicConfig(filename=f'std.log', level=logging.INFO, filemode='w', format='[%(asctime)s-%(levelname)s] %(name)s: %(message)s')
     log.info(f'Starting export')
     log.info(sys.argv[1])
@@ -54,9 +58,9 @@ if __name__ == "__main__":
 
         req = load_request()
 
-        dump_response(es, req, "out")
+        output_file = dump_response(es, req, "out")
         # make a copy to root directory for further pipeline manipulation
-        shutil.copy(os.path.join("out",'dump.json'), 'tmp_dump.json')
+        shutil.copy(output_file, 'tmp_dump.json')
 
     except Exception as e:
         log.exception("compositeexport.py")
