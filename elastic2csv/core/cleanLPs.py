@@ -41,6 +41,6 @@ def clean_lps(file):
 
 if __name__ == "__main__":
     load_dotenv()
-    logging.basicConfig(filename=f'std.log', level=logging.INFO, filemode='w', format='[%(asctime)s-%(levelname)s] %(name)s: %(message)s')
+    logging.basicConfig(level=logging.INFO,format='[%(asctime)s-%(levelname)s] %(name)s: %(message)s')
     log.info(f'Starting cleaning')
     clean_lps("LPList.csv")
