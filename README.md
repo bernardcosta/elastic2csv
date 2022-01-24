@@ -1,5 +1,25 @@
 # elastic2csv
 
+## Directory structure
+
+```
+elastic2csv
+  ├── elastic2csv/ (python root directory)
+  │   ├── config.py
+  │   ├── core
+  │   │   ├── cleanLPs.py
+  │   │   ├── combine.py
+  │   │   └── compositeexport.py
+  │   ├── out/
+  │   ├── request.json
+  │   ├── requirements.txt
+  │   └── setup.py
+  ├── Dockerfile
+  ├── README.md
+  ├── docker-compose.yml
+  └── run/
+```
+
 This python repo. downloads data from an `elasticsearch` server using the `composite` query to be able to handle large amounts of data efficiently. The data dump is then converted to a csv file using `jq`.
 
 The query to `elasticsearch` should be saved into a file called `request.json` and place in the root python directory `elastic2csv/elastic2csv/`. The file should include the [composite aggregation](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-composite-aggregation.html) query like below:

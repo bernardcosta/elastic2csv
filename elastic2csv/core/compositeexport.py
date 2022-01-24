@@ -32,7 +32,7 @@ def dump_response(es_instance, query, out_dir):
 
             after_dict = {"urls":res['aggregations']['two']['after_key']['urls']}
             query['aggs']['two']["composite"]["after"] = after_dict
-            break
+            
     return outfile
 
 def load_request():
