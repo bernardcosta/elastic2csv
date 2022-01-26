@@ -6,7 +6,7 @@
 elastic2csv
   ├── elastic2csv/ (python root directory)
   │   ├── config.py
-  │   ├── core
+  │   ├── core/
   │   │   ├── cleanLPs.py
   │   │   ├── combine.py
   │   │   └── compositeexport.py
@@ -14,9 +14,7 @@ elastic2csv
   │   ├── request.json
   │   ├── requirements.txt
   │   └── setup.py
-  ├── Dockerfile
   ├── README.md
-  ├── docker-compose.yml
   └── run/
 ```
 
@@ -47,12 +45,16 @@ The query to `elasticsearch` should be saved into a file called `request.json` a
  ESSERVER=127.0.0.1:9200
  INDEX=myindex-*
 ```
-## Run with provided Docker Container
 
-If using the provided docker container, then the above environment variables should be placed in a `.env` file in the parent repo directory i.e. same directory as `docker-compose.yml`.
-1. Place the above environment variables in a `.env` file in the same directory as `docker-compose.yml`
-2. Replace the `INDEX` and `ESSEERVER` values to the you are using
-3. Save your desired query, as detailed in the first section, to `request.json` in the python directory `/elastic2csv/elastic2csv/`
+## Running without Docker
+
+To run without docker install the necessary python requirements:
+1. `cd` into the python directory and run:
+```
+pip install -r requirements.txt
+```
+2. Make sure you have `INDEX` and `ESSERVER` as environment variables pointing to the index and elasticsearch server you are querying from respectively.
+3. 3. Save your desired query, as detailed in the first section, to `request.json` in the python directory `/elastic2csv/elastic2csv/`
 
 4. `run.sh` runs the docker container and the conversion from json response to CSV using `jq` with the below line:
 ```
@@ -74,13 +76,3 @@ cat elasticexport/tmp_dump.json | jq -r '.[] | [.key.urls,.doc_count,.three.valu
 or any other combination of fields you like.
 
 6. Run `run.sh` from terminal
-
-## Running without Docker
-
-To run without docker install the necessary python requirements:
-1. `cd` into the python directory and run:
-```
-pip install -r requirements.txt
-```
-2. Make sure you have `INDEX` and `ESSERVER` as environment variables pointing to the index and elasticsearch server you are querying from respectively.
-3. Follow point 3. to point 6. above (with `run-dockerless.sh` instead of `run.sh`)
