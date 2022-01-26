@@ -16,12 +16,13 @@ def mkdir(rel_path):
       os.makedirs(rel_path)
       log.info(f'New Directory Created: {rel_path}')
     else:
-        log.info(f'Path already exists. Will overwrite output')
+        log.info(f'Output Directory already created.')
 
 
 def dump_response(es_instance, query, out_dir):
     outfile = os.path.join(out_dir,f'dump{str(datetime.now()).replace(" ","")}.json')
     with open(outfile, 'a+') as out:
+        count = 1
         while True:
             res = es_instance.search(index=str(os.environ['INDEX']), query=query["query"], aggs=query["aggs"])
 
@@ -31,8 +32,10 @@ def dump_response(es_instance, query, out_dir):
                 break
 
             after_dict = {"urls":res['aggregations']['two']['after_key']['urls']}
+            log.info(f'p{count} - {count * 700}: {after_dict}')
             query['aggs']['two']["composite"]["after"] = after_dict
-            
+            count = count + 1
+
     return outfile
 
 def load_request():
@@ -52,7 +55,7 @@ if __name__ == "__main__":
     try:
         mkdir("out")
 
-        es = Elasticsearch([os.environ["ESSERVER"]])
+        es = Elasticsearch([os.environ["ESSERVER"]], timeout=500)
         log.info("Connected to elasticsearch server")
         log.info(str(sys.argv[1]))
 
