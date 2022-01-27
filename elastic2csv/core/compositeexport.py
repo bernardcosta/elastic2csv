@@ -41,7 +41,7 @@ def dump_response(es_instance, query, out_dir):
 def load_request():
     with open(str(sys.argv[1]), encoding='utf-8') as f:
         request = json.loads(f.read())
-        log.info('Reading request file')
+        log.info(f'Reading request file \n {request}')
         return request
 
 
