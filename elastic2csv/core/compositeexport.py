@@ -21,6 +21,7 @@ def mkdir(rel_path):
 
 def dump_response(es_instance, query, out_dir):
     outfile = os.path.join(out_dir,f'dump{str(datetime.now()).replace(" ","")}.json')
+    log.info(f'dumping data to {outfile}')
     with open(outfile, 'a+') as out:
         count = 1
         while True:
@@ -31,7 +32,7 @@ def dump_response(es_instance, query, out_dir):
             if "after_key" not in res['aggregations']['two']:
                 break
 
-            after_dict = {"urls":res['aggregations']['two']['after_key']['urls']}
+            after_dict = {"split":res['aggregations']['two']['after_key']['split']}
             log.info(f'p{count} - {count * 700}: {after_dict}')
             query['aggs']['two']["composite"]["after"] = after_dict
             count = count + 1
@@ -60,6 +61,7 @@ if __name__ == "__main__":
         log.info(str(sys.argv[1]))
 
         req = load_request()
+        log.info('dumping response')
 
         output_file = dump_response(es, req, "out")
         # make a copy to root directory for further pipeline manipulation
