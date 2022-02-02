@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import logging
 log = logging.getLogger(__name__)
 import sys
-from elasticsearch import Elasticsearch
 import os
 
 
@@ -17,7 +16,7 @@ if __name__ == "__main__":
     try:
         ce.mkdir("out")
 
-        ce.connect_elasticsearch()
+        es = ce.connect_elasticsearch()
 
         req = ce.load_request(sys.argv[1])
         log.info('dumping response')
