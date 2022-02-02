@@ -17,9 +17,7 @@ if __name__ == "__main__":
     try:
         ce.mkdir("out")
 
-        es = Elasticsearch([os.environ["ESSERVER"]], timeout=500)
-        log.info("Connected to elasticsearch server")
-        log.info(str(sys.argv[1]))
+        ce.connect_elasticsearch()
 
         req = ce.load_request(sys.argv[1])
         log.info('dumping response')

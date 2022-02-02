@@ -16,6 +16,10 @@ def mkdir(rel_path):
     else:
         log.info(f'Output Directory already created.')
 
+def connect_elasticsearch():
+    log.info("Connected to elasticsearch server")
+    log.info(str(sys.argv[1]))
+    return Elasticsearch([os.environ["ESSERVER"]], timeout=500)
 
 def search_and_export(es_instance, query, out_dir):
     outfile = os.path.join(out_dir,f'dump{str(datetime.now()).replace(" ","")}.json')
