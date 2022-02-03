@@ -1,9 +1,8 @@
 import json
-import os, shutil
+import os
 from datetime import datetime
 import logging
 import sys
-import traceback
 log = logging.getLogger(__name__)
 from elasticsearch import Elasticsearch
 
@@ -17,10 +16,10 @@ def mkdir(rel_path):
     else:
         log.info(f'Output Directory already created.')
 
-def connect_elasticsearch():
+def connect_elasticsearch(host='localhost', port=9201):
     log.info("Connected to elasticsearch server")
     log.info(str(sys.argv[1]))
-    return Elasticsearch([os.environ["ESSERVER"]], timeout=500)
+    return Elasticsearch([f'{host}:{str(port)}'], timeout=500)
 
 
 def find_key(d):

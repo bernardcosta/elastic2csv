@@ -3,7 +3,8 @@ from dotenv import load_dotenv
 import logging
 log = logging.getLogger(__name__)
 import sys
-import os
+import os, shutil
+import traceback
 
 
 if __name__ == "__main__":
@@ -15,7 +16,7 @@ if __name__ == "__main__":
 
     try:
         ce.mkdir("out")
-
+        #TODO: improve call to local elasticsearch from sh file to python to module
         es = ce.connect_elasticsearch()
 
         req = ce.load_request(sys.argv[1])
