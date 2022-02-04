@@ -1,13 +1,10 @@
-#!/bin/sh
-# export .env files
-export $(grep -v '^#' ../.env | xargs)
-main(){
+#!/bin/bash
+function main(){
+
   QUERY_REQUEST=""
   ESDOMAIN=""
   INDEX=""
-  SERVER=""
   OUTPUT="./out/exportedData.csv"
-
 
   OPTIND=1
   # Resetting OPTIND is necessary if getopts was used previously in the script.
@@ -16,10 +13,10 @@ main(){
          case $opt in
              h) usage
                 exit 0 ;;
-             q)  QUERY_REQUEST="$OPTARG" ;;
+             q)  QUERY_REQUEST=$OPTARG ;;
              o)  OUTPUT=$OPTARG ;;
              i)  INDEX=$OPTARG ;;
-             d)  ESDOMAIN="$OPTARG" ;;
+             d)  ESDOMAIN=$OPTARG ;;
              s)  SERVER=$OPTARG ;;
              *)  usage >&2
                  exit 1 ;;
@@ -27,11 +24,7 @@ main(){
      done
 
 
-  if [[ -z $QUERY_REQUEST  ||  -z $ESDOMAIN ]]
-  then
-    echo "ERROR: -q <query> and -d <hostname> are mandatory arguments. See usage: \n";
-    usage;
-  fi
+  check_mandatory_fields;
 
   shift "$((OPTIND-1))"   # Discard the options and sentinel --
 
@@ -63,7 +56,7 @@ main(){
 
 }
 
-usage(){
+function usage(){
 cat << EOF
 elastic2csv - automated process for exporting elastic queries to csv files
 
@@ -77,5 +70,16 @@ Usage: ${0##*/} [options] [-q QUERY] <json file> [-d DOMAIN] <hostname>
    -s <server connection>  Remote server name,port, user where elasticsearch is hosted on
 EOF
 }
+
+function check_mandatory_fields(){
+  if [[ -z $QUERY_REQUEST  ||  -z $ESDOMAIN ]]
+  then
+    echo "ERROR: -q <query> and -d <hostname> are mandatory arguments. See usage: \n";
+    usage;
+    exit 1;
+  fi
+}
+# export .env files
+export $(grep -v '^#' ../.env | xargs)
 
 main "$@"; exit
