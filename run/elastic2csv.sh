@@ -40,7 +40,7 @@ export $(grep -v '^#' ../.env | xargs)
 QUERY_REQUEST=""
 ESDOMAIN=""
 OUTPUT="./out/exportedData.csv"
-
+INDEX=""
 OPTIND=1
 # Resetting OPTIND is necessary if getopts was used previously in the script.
 # It is a good idea to make OPTIND local if you process options in a function.
@@ -64,15 +64,15 @@ check_mandatory_fields;
 shift "$((OPTIND-1))"   # Discard the options and sentinel --
 
 # Port forward remote elasticsearch server
+echo ${ESDOMAIN}
+echo $( domain ${ESDOMAIN} )
+
+# kill ssh tunnel already using this port
+kill $( ps aux | grep '[9]201:' | awk '{print $2}' )
 ssh -f -N -q -L "9201:"$( domain ${ESDOMAIN} ) ${SERVER}
 
-
-# run python script to extract data from elasticsearch
-#python3 main.py ${QUERY_REQUEST} ${OUTPUT}
-
-
-# run python script to extract data from elasticsearch
-#python3 main.py $2 $3
+#run python script to extract data from elasticsearch
+python3 main.py ${QUERY_REQUEST} ${INDEX}
 
 # extract useful values from json to csv
 #cat tmp_dump.json | jq -r '["url","unique sessions","revenue", "total sessions"], (.[] | [.key.urls,.one.value,.three.value,.doc_count]) | @csv' > $3

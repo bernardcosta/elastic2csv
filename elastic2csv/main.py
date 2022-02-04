@@ -12,6 +12,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s-%(levelname)s] %(name)s: %(message)s')
     log.info(f'Starting export')
     log.info(sys.argv[1])
+    log.info(sys.argv[2])
     log.info(len(sys.argv))
 
     try:
@@ -21,8 +22,7 @@ if __name__ == "__main__":
 
         req = ce.load_request(sys.argv[1])
         log.info('dumping response')
-
-        output_file = ce.search_and_export(es, req, "out")
+        output_file = ce.search_and_export(es, req, "out", sys.argv[2])
         # make a copy to root directory for further pipeline manipulation
         shutil.copy(output_file, 'tmp_dump.json')
 

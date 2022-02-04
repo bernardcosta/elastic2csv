@@ -32,15 +32,16 @@ def find_key(d):
                 return [k] + p
 
 
-def search_and_export(es_instance, query, out_dir):
+def search_and_export(es_instance, query, out_dir, index):
     outfile = os.path.join(out_dir,f'dump{str(datetime.now()).replace(" ","")}.json')
-    log.info(f'dumping data to {outfile}')
+    log.info(f'dumping data to: {outfile}')
     split_key = find_key(query)[-2]
+    log.info(f'split key: {split_key}')
+
     with open(outfile, 'a+') as out:
         count = 1
         while True:
-            res = es_instance.search(index=str(os.environ['INDEX']), query=query["query"], aggs=query["aggs"])
-
+            res = es_instance.search(index=str(index+"-*"), query=query["query"], aggs=query["aggs"])
             out.write(json.dumps(res['aggregations'][split_key]['buckets']))
             out.write("\n")
             if "after_key" not in res['aggregations'][split_key]:
@@ -56,5 +57,5 @@ def search_and_export(es_instance, query, out_dir):
 def load_request(directory):
     with open(str(directory), encoding='utf-8') as f:
         request = json.loads(f.read())
-        log.info(f'Reading request file \n {request}')
+        log.info(f'Loading request file. Size {os.path.getsize(directory) / 1000}Kb')
         return request
