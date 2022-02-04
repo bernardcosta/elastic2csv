@@ -20,9 +20,6 @@ export $(grep -v '^#' ../.env | xargs)
 #rm $3
 #mv tmp.csv $3
 
-# QUERY_REQUEST=""
-OUTPUT='./out/exportedData.csv'
-
 usage(){
 cat << EOF
 elastic2csv - automated process for exporting elastic queries to csv files
@@ -38,40 +35,40 @@ Usage: ${0##*/} [options] [-q QUERY] <json file> [-d DOMAIN] <hostname>
 EOF
 }
 
+QUERY_REQUEST=""
+ESDOMAIN=""
+INDEX=""
+SERVER=""
+OUTPUT="./out/exportedData.csv"
+
+
 OPTIND=1
 # Resetting OPTIND is necessary if getopts was used previously in the script.
 # It is a good idea to make OPTIND local if you process options in a function.
-while getopts hqoids: opt; do
+while getopts "hq:o:i:d:s:" opt; do
        case $opt in
-           h)
-               usage
-               exit 0
-               ;;
-           q)  QUERY_REQUEST=$OPTARG
-               ;;
-           o)  OUTPUT=$OPTARG
-               ;;
-           i)  INDEX=$OPTARG
-               ;;
-           d)  ESDOMAIN=$OPTARG
-              ;;
-            s)  SERVER=$OPTARG
-            ;;
-           *)
-               usage >&2
-               exit 1
-               ;;
+           h) usage
+              exit 0 ;;
+           q)  QUERY_REQUEST="$OPTARG" ;;
+           o)  OUTPUT=$OPTARG ;;
+           i)  INDEX=$OPTARG ;;
+           d)  ESDOMAIN="$OPTARG" ;;
+           s)  SERVER=$OPTARG ;;
+           *)  usage >&2
+               exit 1 ;;
        esac
    done
 
-shift "$((OPTIND-1))"   # Discard the options and sentinel --
 
 if [[ -z $QUERY_REQUEST  ||  -z $ESDOMAIN ]]
 then
-  usage;
-else
+  echo $QUERY_REQUEST;
+  echo $ESDOMAIN;
+  echo "ERROR: -q <query> and -d <hostname> are mandatory arguments. See usage: \n";
   usage;
 fi
+
+shift "$((OPTIND-1))"   # Discard the options and sentinel --
 
 
 # Port forward remote elasticsearch server
