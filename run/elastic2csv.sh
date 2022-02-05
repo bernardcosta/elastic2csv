@@ -78,7 +78,6 @@ python3 main.py ${QUERY_REQUEST} ${INDEX}
 # Selecting columns automaically based on elasticsearch consistent output keys
 COLUMNS=$(cat ${QUERY_REQUEST} | jq --arg v $TOTAL_COLS '.aggs.two.aggs | keys_unsorted | .[:$v|tonumber] | ["\(.[:$v|tonumber] | .[]).value"] |.[:$v|tonumber] |= . + ["doc_count"] | .[:0] |= . + ["key.split"] | [ .[] | split(".")]')
 # extract useful values from json to csv
-echo $COLUMNS
 cat tmp_dump.json | jq -r --argjson v "$COLUMNS" '.[] | [ getpath( $v[]) ] | @csv' > $OUTPUT
 #python3 ./core/cleanLPs.py
 
