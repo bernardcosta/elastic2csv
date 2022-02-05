@@ -13,7 +13,6 @@ if __name__ == "__main__":
     log.info(f'Starting export')
     log.info(sys.argv[1])
     log.info(sys.argv[2])
-    log.info(len(sys.argv))
 
     try:
         ce.mkdir("out")

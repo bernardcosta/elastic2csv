@@ -13,12 +13,9 @@ def mkdir(rel_path):
       # Create a new directory because it does not exist
       os.makedirs(rel_path)
       log.info(f'New Directory Created: {rel_path}')
-    else:
-        log.info(f'Output Directory already created.')
 
 def connect_elasticsearch(host='localhost', port=9201):
     log.info("Connected to elasticsearch server")
-    log.info(str(sys.argv[1]))
     return Elasticsearch([f'{host}:{str(port)}'], timeout=500)
 
 
@@ -57,5 +54,5 @@ def search_and_export(es_instance, query, out_dir, index):
 def load_request(directory):
     with open(str(directory), encoding='utf-8') as f:
         request = json.loads(f.read())
-        log.info(f'Loading request file. Size {os.path.getsize(directory) / 1000}Kb')
+        log.info(f'Loading {directory} - Size {os.path.getsize(directory) / 1000}Kb')
         return request
