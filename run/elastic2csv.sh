@@ -18,17 +18,19 @@ Usage: ${0##*/} [options] [-q QUERY] <json file> [-d DOMAIN] <hostname>
 
    -h                      Display this help and exit
    -q <json file>          Input json request file which contains elasticsearch query
+   -c <integer>            No of columns to show on output. This script will grab the first n keys found in query json
+   -d <hostname>           The hostname of the elasticserach SERVER
    -o <output file>        File or dir to save the csv response
    -i <index name>         Elasticsearch index name or pattern to search from
-   -d <hostname>           The hostname of the elasticserach SERVER
    -s <server connection>  Remote server name,port, user where elasticsearch is hosted on
+
 EOF
 }
 
 check_mandatory_fields(){
-  if [[ -z $QUERY_REQUEST  ||  -z $ESDOMAIN ]]
+  if [[ -z $QUERY_REQUEST  ||  -z $ESDOMAIN || -z $TOTAL_COLS ]]
   then
-    echo "ERROR: -q <query> and -d <hostname> are mandatory arguments. See usage: \n";
+    echo "ERROR: -q <query> and -d <hostname> -c <columns> are mandatory arguments. See usage: \n";
     usage;
     exit 1;
   fi
@@ -41,10 +43,11 @@ QUERY_REQUEST=""
 ESDOMAIN=""
 OUTPUT="./out/exportedData.csv"
 INDEX=""
+TOTAL_COLS=""
 OPTIND=1
 # Resetting OPTIND is necessary if getopts was used previously in the script.
 # It is a good idea to make OPTIND local if you process options in a function.
-while getopts "hq:o:i:d:s:" opt; do
+while getopts "hq:o:i:d:s:c:" opt; do
        case $opt in
            h) usage
               exit 0 ;;
@@ -53,6 +56,7 @@ while getopts "hq:o:i:d:s:" opt; do
            i)  INDEX=$OPTARG ;;
            d)  ESDOMAIN=$OPTARG ;;
            s)  SERVER=$OPTARG ;;
+           c)  TOTAL_COLS=$OPTARG ;;
            *)  usage >&2
                exit 1 ;;
        esac
@@ -74,7 +78,9 @@ ssh -f -N -q -L "9201:"$( domain ${ESDOMAIN} ) ${SERVER}
 #run python script to extract data from elasticsearch
 python3 main.py ${QUERY_REQUEST} ${INDEX}
 
+COLUMNS=$(cat ${QUERY_REQUEST} | jq --arg v $TOTAL_COLS '.aggs.two.aggs | keys_unsorted | .[:$v|tonumber] | ["\(.[:$v|tonumber] | .[]).value"] |.[:$v|tonumber] |= . + ["doc_count"] | .[:0] |= . + ["key.split"] | [ .[] | split(".")]')
 # extract useful values from json to csv
+cat tmp_dump.json | jq --argjson v "$COLUMNS" '.[] | [ getpath( $v[]) ]'
 #cat tmp_dump.json | jq -r '["url","unique sessions","revenue", "total sessions"], (.[] | [.key.urls,.one.value,.three.value,.doc_count]) | @csv' > $3
 #cat tmp_dump.json | jq -r '.[] | [.key.split,.three.value,.one.value,.five.value,.six.value,.doc_count] | @csv' > $3
 
