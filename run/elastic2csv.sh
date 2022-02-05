@@ -1,4 +1,4 @@
-#!/bin/bash
+# #!/bin/bash
 domain(){
   if [ "$1" = "bi" ]; then
     echo ${BI};
@@ -41,7 +41,7 @@ export $(grep -v '^#' ../.env | xargs)
 
 QUERY_REQUEST=""
 ESDOMAIN=""
-OUTPUT="./out/exportedData.csv"
+OUTPUT="./out/finalExportedData.csv"
 INDEX=""
 TOTAL_COLS=""
 OPTIND=1
@@ -67,30 +67,25 @@ check_mandatory_fields;
 
 shift "$((OPTIND-1))"   # Discard the options and sentinel --
 
-# Port forward remote elasticsearch server
-echo ${ESDOMAIN}
-echo $( domain ${ESDOMAIN} )
-
 # kill ssh tunnel already using this port
 kill $( ps aux | grep '[9]201:' | awk '{print $2}' )
+# Port forward remote elasticsearch server
 ssh -f -N -q -L "9201:"$( domain ${ESDOMAIN} ) ${SERVER}
 
-#run python script to extract data from elasticsearch
+# run python script to extract data from elasticsearch
 python3 main.py ${QUERY_REQUEST} ${INDEX}
 
+# Selecting columns automaically based on elasticsearch consistent output keys
 COLUMNS=$(cat ${QUERY_REQUEST} | jq --arg v $TOTAL_COLS '.aggs.two.aggs | keys_unsorted | .[:$v|tonumber] | ["\(.[:$v|tonumber] | .[]).value"] |.[:$v|tonumber] |= . + ["doc_count"] | .[:0] |= . + ["key.split"] | [ .[] | split(".")]')
 # extract useful values from json to csv
-cat tmp_dump.json | jq --argjson v "$COLUMNS" '.[] | [ getpath( $v[]) ]'
-#cat tmp_dump.json | jq -r '["url","unique sessions","revenue", "total sessions"], (.[] | [.key.urls,.one.value,.three.value,.doc_count]) | @csv' > $3
-#cat tmp_dump.json | jq -r '.[] | [.key.split,.three.value,.one.value,.five.value,.six.value,.doc_count] | @csv' > $3
-
+echo $COLUMNS
+cat tmp_dump.json | jq -r --argjson v "$COLUMNS" '.[] | [ getpath( $v[]) ] | @csv' > $OUTPUT
 #python3 ./core/cleanLPs.py
 
 # remove all unnecesary double quotes
-#sed -i '' 's/"//g' $3
+sed -i '' 's/"//g' $OUTPUT
 
-
-# Get all rows with <= 5 commas
-#grep -xE '([^,]*,){0,$3}[^,]*' $3 > tmp.csv
-#rm $3
+# Get all rows with <= n commas
+#grep -xE '([^,]*,){0,$TOTAL_COLS}[^,]*' $OUTPUT > tmp.csv
+#rm
 #mv tmp.csv $3
