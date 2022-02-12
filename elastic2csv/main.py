@@ -20,8 +20,9 @@ if __name__ == "__main__":
     required_named.add_argument('-i', '--index', type=str, required=True, help='Index pattern name example "logstash". "-*" will be added.')
 
     args.add_argument('-u', '--url', type=str, default='http://localhost:9200',help='Host server url with default: %(default)s.')
-    args.add_argument('-su', '--server-username', type=str, help='if url is from remote ssh enter username')
-    args.add_argument('-sh', '--server-host', type=str, help='if url is from remote ssh enter host')
+    args.add_argument('-su', '--server-username', type=str, help='if url is from remote ssh enter username. You need ssh access credentials for this to work')
+    args.add_argument('-sh', '--server-host', type=str, help='if url is from remote ssh enter host. You need ssh access creddential for this to work')
+    args.add_argument('-o', '--out-dir', type=str, default='out', help='Directory where to save the json file dump')
 
 
     #
@@ -42,8 +43,8 @@ if __name__ == "__main__":
     try:
         log.info(f'Starting export')
 
-        # es.connect()
-        # es.search()
+        es.connect()
+        es.search()
 
     except Exception as e:
         log.exception("main.py")

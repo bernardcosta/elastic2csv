@@ -4,6 +4,9 @@ import logging
 log = logging.getLogger(__name__)
 import json
 import os
+from datetime import datetime
+
+
 
 class Elastic2csv:
 
@@ -49,23 +52,28 @@ class Elastic2csv:
         #                progressbar.FileTransferSpeed(unit='docs'), ']'
         #                ]
         # bar = progressbar.ProgressBar(widgets=widgets, maxval=num_results).start()
+        outfile = os.path.join(self.args.out_dir,f'dump{str(datetime.now()).replace(" ","")}.json')
 
-        while total_hits != num_results:
-            total_hits += 1
-            if res['_scroll_id'] not in self.scroll_ids:
-                self.scroll_ids.append(res["_scroll_id"])
+        with open(outfile, 'a+') as out:
+            while total_hits != num_results:
+                total_hits += 1
+                if res['_scroll_id'] not in self.scroll_ids:
+                    self.scroll_ids.append(res["_scroll_id"])
 
-            if not res['hits']['hits']:
+                if not res['hits']['hits']:
+                    break
+
+                for hit in res['hits']['hits']:
+                     out.write(json.dumps(hit))
+                     out.write("\n")
+                     # log.info(f'p{count} - {count * 700}: {after_dict}')
+                     # bar.update(total_lines)
+                     # log.info(hit)
+
+                     res = self.connection.scroll(scroll=self.scroll, scroll_id=res["_scroll_id"])
+                     break
+
                 break
-
-            for hit in res['hits']['hits']:
-                 # out.write(json.dumps(res['aggregations'][split_key]['buckets']))
-                 # out.write("\n")
-                 # bar.update(total_lines)
-
-
-
-                 res = self.connection.scroll(scroll=self.scroll, scroll_id=res["_scroll_id"])
 
 
     def clean_scroll_ids(self):
