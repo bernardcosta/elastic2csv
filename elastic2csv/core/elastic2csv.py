@@ -30,15 +30,15 @@ class Elastic2csv:
 
         total_hits = 0
 
-        widgets = ['Run query ',
-                       progressbar.Bar(left='[', marker='#', right=']'),
-                       progressbar.FormatLabel(' [%(value)i/%(max)i] ['),
-                       progressbar.Percentage(),
-                       progressbar.FormatLabel('] [%(elapsed)s] ['),
-                       progressbar.ETA(), '] [',
-                       progressbar.FileTransferSpeed(unit='docs'), ']'
-                       ]
-        bar = progressbar.ProgressBar(widgets=widgets, maxval=num_results).start()
+        # widgets = ['Run query ',
+        #                progressbar.Bar(left='[', marker='#', right=']'),
+        #                progressbar.FormatLabel(' [%(value)i/%(max)i] ['),
+        #                progressbar.Percentage(),
+        #                progressbar.FormatLabel('] [%(elapsed)s] ['),
+        #                progressbar.ETA(), '] [',
+        #                progressbar.FileTransferSpeed(unit='docs'), ']'
+        #                ]
+        # bar = progressbar.ProgressBar(widgets=widgets, maxval=num_results).start()
 
         while total_hits != num_results:
             total_hits += 1
@@ -51,7 +51,7 @@ class Elastic2csv:
             for hit in res['hits']['hits']:
                  # out.write(json.dumps(res['aggregations'][split_key]['buckets']))
                  # out.write("\n")
-                 bar.update(total_lines)
+                 # bar.update(total_lines)
 
 
 
