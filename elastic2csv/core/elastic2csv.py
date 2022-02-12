@@ -14,6 +14,16 @@ class Elastic2csv:
         self.timeout = timeout
         self.connection = None
         self.query = None
+        if self.args.server_username and self.args.server_host:
+            self.port_forward()
+
+
+    def port_forward(self):
+        os.system("kill $( ps aux | grep '[9]201:' | awk '{print $2}' )")
+        log.info("Using port 9201 to forward remote server to local.")
+        os.system(f'ssh -f -N -q -L "9201:{self.args.url}" {self.args.server_username}@{self.args.server_host}')
+        self.args.url="http://localhost:9201"
+
 
 
     #TODO: retry connections

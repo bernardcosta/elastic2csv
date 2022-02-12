@@ -12,13 +12,17 @@ import argparse
 if __name__ == "__main__":
     load_dotenv()
     logging.basicConfig(level=logging.INFO, format='[%(asctime)s-%(levelname)s] %(name)s: %(message)s')
-    log.info(f'Starting export')
 
 
     args = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    args.add_argument('-r', '--request-file', type=str, required=True, help='Json file containing query.')
+    required_named = args.add_argument_group('required named arguments')
+    required_named.add_argument('-r', '--request-file', type=str, required=True, help='Json file containing query.')
+    required_named.add_argument('-i', '--index', type=str, required=True, help='Index pattern name example "logstash". "-*" will be added.')
+
     args.add_argument('-u', '--url', type=str, default='http://localhost:9200',help='Host server url with default: %(default)s.')
-    args.add_argument('-i', '--index', type=str, required=True, help='Index pattern name example "logstash". "-*" will be added.')
+    args.add_argument('-su', '--server-username', type=str, help='if url is from remote ssh enter username')
+    args.add_argument('-sh', '--server-host', type=str, help='if url is from remote ssh enter host')
+
 
     #
     # try:
@@ -36,9 +40,10 @@ if __name__ == "__main__":
     #     log.exception("compositeexport.py")
     es = elastic2csv.Elastic2csv(args.parse_args())
     try:
+        log.info(f'Starting export')
 
-        es.connect()
-        es.search()
+        # es.connect()
+        # es.search()
 
     except Exception as e:
         log.exception("main.py")
