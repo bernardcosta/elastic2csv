@@ -4,9 +4,8 @@ pt-sg-my/
 .env
 elastic2csv/out
 std.log
-request.json
-new_request.json
-tmp_dump.json
-LPList.csv
-output.csv
-run-docker-local-bi.sh
+run.log
+out/dump*.json
+FinalOutput*.csv
+queries/
+

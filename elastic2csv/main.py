@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from core import compositeexport as ce
 from core import elastic2csv
 from dotenv import load_dotenv
@@ -11,7 +13,7 @@ import argparse
 
 if __name__ == "__main__":
     load_dotenv()
-    logging.basicConfig(level=logging.INFO, format='[%(asctime)s-%(levelname)s] %(name)s: %(message)s')
+    logging.basicConfig(filename='runs.log', level=logging.INFO, format='[%(asctime)s-%(levelname)s] %(name)s: %(message)s')
 
 
     args = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
