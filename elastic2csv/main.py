@@ -4,11 +4,11 @@ from core import compositeexport as ce
 from core import elastic2csv
 from dotenv import load_dotenv
 import logging
-log = logging.getLogger(__name__)
 import sys
 import os, shutil
 import traceback
 import argparse
+log = logging.getLogger(__name__)
 
 
 if __name__ == "__main__":
@@ -26,24 +26,8 @@ if __name__ == "__main__":
     args.add_argument('-sh', '--server-host', type=str, help='if url is from remote ssh enter host. You need ssh access creddential for this to work')
     args.add_argument('-o', '--out-dir', type=str, default='out', help='Directory where to save the json file dump')
 
-
-    #
-    # try:
-    #     ce.mkdir("out")
-    #     #TODO: improve call to local elasticsearch from sh file to python to module
-    #     es = ce.connect_elasticsearch()
-    #
-    #     req = ce.load_request(sys.argv[1])
-    #     log.info('dumping response')
-    #     output_file = ce.search_and_export(es, req, "out", sys.argv[2])
-    #     # make a copy to root directory for further pipeline manipulation
-    #     shutil.copy(output_file, 'tmp_dump.json')
-    #
-    # except Exception as e:
-    #     log.exception("compositeexport.py")
     es = elastic2csv.Elastic2csv(args.parse_args())
     try:
-        log.info(f'Starting export')
 
         es.connect()
         es.search()
