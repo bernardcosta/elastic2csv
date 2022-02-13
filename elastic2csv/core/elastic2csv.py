@@ -74,9 +74,8 @@ class Elastic2csv:
 
         data = json.load(open(outfile, 'r'))
         data = utils.flatten_json_list(data)
-        print(data)
 
-        with open("output.csv","w") as f:  # python 2: open("output.csv","wb")
+        with open("output.csv","w") as f:
 
             columns = ["key.split","doc_count","three.value","one.value","five.value","six.value"] # quick hack
             cw = csv.DictWriter(f, columns, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, extrasaction='ignore')
