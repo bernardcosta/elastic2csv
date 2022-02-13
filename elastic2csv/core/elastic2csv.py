@@ -36,11 +36,10 @@ class Elastic2csv:
 
     def search(self):
         self.load_request_file()
-        res = self.connection.search(index=str(self.args.index)+"-*", query=self.query["query"], aggs=self.query["aggs"], scroll=self.scroll)
-        num_results = res['hits']['total']['value']
-        log.info(f'Total Results {num_results}')
-        scroll_id = res["_scroll_id"]
-
+        # res = self.connection.search(index=str(self.args.index)+"-*", query=self.query["query"], aggs=self.query["aggs"])
+        # num_results = res['hits']['total']['value']
+        # log.info(f'Total Results {num_results}')
+        # scroll_id = res["_scroll_id"]
         total_hits = 0
 
         # widgets = ['Run query ',
@@ -53,37 +52,25 @@ class Elastic2csv:
         #                ]
         # bar = progressbar.ProgressBar(widgets=widgets, maxval=num_results).start()
         outfile = os.path.join(self.args.out_dir,f'dump{str(datetime.now()).replace(" ","")}.json')
+        split_key = self.find_key(self.query)[-2]
 
         with open(outfile, 'a+') as out:
-            while total_hits != num_results:
-                total_hits += 1
-                if res['_scroll_id'] not in self.scroll_ids:
-                    self.scroll_ids.append(res["_scroll_id"])
+            count = 1
+            while True:
+                res = self.connection.search(index=str(self.args.index)+"-*", query=self.query["query"], aggs=self.query["aggs"])
+                for hit in res['aggregations'][split_key]['buckets']:
+                    total_hits += 1
 
-                if not res['hits']['hits']:
+                    out.write(json.dumps(hit))
+                    out.write("\n")
+
+                if "after_key" not in res['aggregations'][split_key]:
                     break
 
-                for hit in res['hits']['hits']:
-                     out.write(json.dumps(hit))
-                     out.write("\n")
-                     # log.info(f'p{count} - {count * 700}: {after_dict}')
-                     # bar.update(total_lines)
-                     # log.info(hit)
-
-                     res = self.connection.scroll(scroll=self.scroll, scroll_id=res["_scroll_id"])
-                     break
-
-                break
-
-
-    def clean_scroll_ids(self):
-        try:
-            if self.scroll_ids:
-                self.es_conn.clear_scroll(body=','.join(self.scroll_ids))
-            else:
-                log.info("no scroll ids")
-        except:
-            pass
+                after_dict = {"split":res['aggregations'][split_key]['after_key']['split']}
+                log.info(f'p{count} - {count * 700}: {after_dict}')
+                self.query['aggs'][split_key]["composite"]["after"] = after_dict
+                count = count + 1
 
 
     def load_request_file(self):
@@ -91,3 +78,13 @@ class Elastic2csv:
             request = json.loads(f.read())
             log.info(f'Loading {self.args.request_file} - Size {os.path.getsize(self.args.request_file) / 1000}Kb')
             self.query = request
+
+
+    def find_key(self, d):
+        for k,v in d.items():
+            if isinstance(v, dict):
+                p = self.find_key(v)
+                if k == 'composite':
+                    return [k]
+                else:
+                    return [k] + p

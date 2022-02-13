@@ -48,7 +48,3 @@ if __name__ == "__main__":
 
     except Exception as e:
         log.exception("main.py")
-
-    finally:
-        log.info("closing scrolls")
-        es.clean_scroll_ids()
