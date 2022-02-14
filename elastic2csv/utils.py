@@ -17,3 +17,14 @@ def flatten_json_list(list):
         flattened_list.append(flatten(d))
 
     return flattened_list
+
+
+
+def find_key(self, d):
+    for k,v in d.items():
+        if isinstance(v, dict):
+            p = self.find_key(v)
+            if k == 'composite':
+                return [k]
+            else:
+                return [k] + p

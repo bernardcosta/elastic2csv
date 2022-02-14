@@ -21,6 +21,7 @@ class Elastic2csv:
         self.timeout = timeout
         self.connection = None
         self.query = None
+        self.outfile = os.path.join(self.args.out_dir,f'dump{str(datetime.now()).replace(" ","")}.json')
         if self.args.server_username and self.args.server_host:
             self.port_forward()
 
@@ -44,7 +45,7 @@ class Elastic2csv:
         log.info("Searching query...")
         total_hits = 0
         self.load_request_file()
-        split_key = self.find_key(self.query)[-2]
+        split_key = utils.find_key(self.query)[-2]
         c.COUNT_AGG["unique_count"]["cardinality"]["field"] = self.query["aggs"][split_key]["composite"]["sources"][0]["split"]["terms"]["field"]
         res = self.connection.search(index=str(self.args.index)+"-*", query=self.query["query"], aggs=c.COUNT_AGG, size = 0)
         max_hits = res['aggregations']['unique_count']['value']
@@ -59,10 +60,7 @@ class Elastic2csv:
                        ]
         bar = progressbar.ProgressBar(widgets=widgets, maxval=max_hits).start()
 
-        outfile = os.path.join(self.args.out_dir,f'dump{str(datetime.now()).replace(" ","")}.json')
-
-
-        with open(outfile, 'a+') as out:
+        with open(self.outfile, 'a+') as out:
             count = 1
             out.write("[")
             while True:
@@ -83,13 +81,8 @@ class Elastic2csv:
                 count += 1
                 log.info(f'Batch: {count} {total_hits} docs')
 
-        data = json.load(open(outfile, 'r'))
-        data = utils.flatten_json_list(data)
+        self.to_csv()
 
-        with open(f"FinalOutput{str(datetime.now()).replace(' ','')}.csv","w") as f:
-            cw = csv.DictWriter(f, c.COLUMNS, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, extrasaction='ignore')
-            cw.writeheader()
-            cw.writerows(data)
 
     def load_request_file(self):
         with open(str(self.args.request_file), encoding='utf-8') as f:
@@ -99,12 +92,11 @@ class Elastic2csv:
 
         log.info("  Loaded request body file.")
 
+    def to_csv():
+        data = json.load(open(self.outfile, 'r'))
+        data = utils.flatten_json_list(data)
 
-    def find_key(self, d):
-        for k,v in d.items():
-            if isinstance(v, dict):
-                p = self.find_key(v)
-                if k == 'composite':
-                    return [k]
-                else:
-                    return [k] + p
+        with open(f"FinalOutput{str(datetime.now()).replace(' ','')}.csv","w") as f:
+            cw = csv.DictWriter(f, c.COLUMNS, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, extrasaction='ignore')
+            cw.writeheader()
+            cw.writerows(data)
