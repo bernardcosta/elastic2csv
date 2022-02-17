@@ -46,9 +46,11 @@ class Elastic2csv:
         self.load_request_file()
         split_key = utils.find_key(self.query)[-2]
         c.COUNT_AGG["unique_count"]["cardinality"]["field"] = self.query["aggs"][split_key]["composite"]["sources"][0]["split"]["terms"]["field"]
+        # LOG.info(c.COUNT_AGG)
         res = self.connection.search(index=str(self.args.index)+"-*", query=self.query["query"], aggs=c.COUNT_AGG, size = 0)
+        # LOG.info(res)
         max_hits = res['aggregations']['unique_count']['value']
-        print(max_hits)
+        LOG.info(max_hits)
         widgets = ['Run query ',
                        progressbar.Bar(left='[', marker='#', right=']'),
                        progressbar.FormatLabel(' [%(value)i/%(max)i] ['),
@@ -57,7 +59,7 @@ class Elastic2csv:
                        progressbar.ETA(), '] [',
                        progressbar.FileTransferSpeed(unit='docs'), ']'
                        ]
-        pbar = progressbar.ProgressBar(widgets=widgets, maxval=max_hits).start()
+        pbar = progressbar.ProgressBar(widgets=widgets, maxval=max_hits+1000).start()
 
         with open(self.outfile, 'a+', encoding='UTF-8') as out:
             out.write("[")
@@ -66,9 +68,11 @@ class Elastic2csv:
                 for hit in res['aggregations'][split_key]['buckets']:
                     if total_hits > 0:
                         out.write(",\n")
-                    total_hits += 1
+
                     out.write(json.dumps(hit))
-                    pbar.update(total_hits)
+                    if total_hits <= maxval:
+                        pbar.update(total_hits)
+                    total_hits += 1
 
                 if "after_key" not in res['aggregations'][split_key]:
                     out.write("]")
@@ -76,6 +80,8 @@ class Elastic2csv:
 
                 after_dict = {"split":res['aggregations'][split_key]['after_key']['split']}
                 self.query['aggs'][split_key]["composite"]["after"] = after_dict
+                # break
+            LOG.info(total_hits)
 
 
     def load_request_file(self):
