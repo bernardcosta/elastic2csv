@@ -19,7 +19,6 @@ def flatten_json_list(list):
     return flattened_list
 
 
-
 def find_key(d):
     for k,v in d.items():
         if isinstance(v, dict):

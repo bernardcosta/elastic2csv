@@ -1,6 +1,6 @@
 astroid==2.9.3
 certifi==2021.10.8
--e git+ssh://git@github.com/bernardcosta/elastic2csv.git@8de8f6635896a00ab4aad552c0dae024aa3683c1#egg=elastic2csv&subdirectory=elastic2csv
+-e git+ssh://git@github.com/bernardcosta/elastic2csv.git@e6cd74f33b286455e4145d593c2fb8de7abc7796#egg=elastic2csv&subdirectory=elastic2csv
 elasticsearch==7.16.3
 isort==5.10.1
 lazy-object-proxy==1.7.1
