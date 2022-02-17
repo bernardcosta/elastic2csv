@@ -28,19 +28,20 @@ if __name__ == "__main__":
     args.add_argument('-c', '--convert-only', type=str, help='Directory to dump file to convert to csv')
     args.add_argument('-d', '--dump-only', action='store_true', help='flag to only export data from elasticserach (no conversion)')
 
-    es = elastic2csv.Elastic2csv(args.parse_args())
+    arguments = args.parse_args()
+    es = elastic2csv.Elastic2csv(arguments)
     try:
 
-        if args.convert_only and args.dump_only:
+        if arguments.convert_only and arguments.dump_only:
             raise Exception("Cannot assign both -c and -d flags at the same time")
 
-        if not args.convert_only:
+        if not arguments.convert_only:
             es.connect()
             es.search()
-            if not args.dump_only:
+            if not arguments.dump_only:
                 es.to_csv()
         else:
-            es.to_csv(args.convert_only)
+            es.to_csv(file=arguments.convert_only)
 
     except Exception as e:
         log.exception("main.py")

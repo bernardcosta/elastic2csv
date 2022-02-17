@@ -87,8 +87,8 @@ class Elastic2csv:
 
         log.info("  Loaded request body file.")
 
-    def to_csv(file=None):
-        if file is not None
+    def to_csv(self, file=None):
+        if file is not None:
             data = json.load(open(file, 'r'))
         else:
             data = json.load(open(self.outfile, 'r'))
