@@ -21,7 +21,7 @@ class Elastic2csv:
         self.timeout = timeout
         self.connection = None
         self.query = None
-        self.outfile = os.path.join(self.args.out_dir,f'dump{str(datetime.now()).replace(" ","")}.json')
+        self.outfile = os.path.join("out",f'dump{str(datetime.now()).replace(" ","")}.json')
         if self.args.server_username and self.args.server_host:
             self.port_forward()
 
@@ -93,11 +93,9 @@ class Elastic2csv:
         data = json.load(open(self.outfile, 'r', encoding='UTF-8'))
         data = utils.flatten_json_list(data)
 
-        csv_file = f"FinalOutput{str(datetime.now()).replace(' ','')}.csv"
-
-        with open(csv_file,"w", encoding='UTF-8') as f:
+        with open(self.args.output_file,"w", encoding='UTF-8') as f:
             cw = csv.DictWriter(f, c.COLUMNS, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, extrasaction='ignore')
             cw.writeheader()
             cw.writerows(data)
 
-        os.system(f"awk -F , 'NF == 3' < {csv_file} > out.tmp && mv out.tmp {csv_file}")
+        os.system(f"awk -F , 'NF == 3' < {self.args.output_file} > out.tmp && mv out.tmp {self.args.output_file}")

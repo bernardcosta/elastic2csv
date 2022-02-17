@@ -18,7 +18,7 @@ if __name__ == "__main__":
     args.add_argument('-u', '--url', type=str, default='http://localhost:9200',help='Host server url with default: %(default)s.')
     args.add_argument('-su', '--server-username', type=str, help='if url is from remote ssh enter username. You need ssh access credentials for this to work')
     args.add_argument('-sh', '--server-host', type=str, help='if url is from remote ssh enter host. You need ssh access creddential for this to work')
-    args.add_argument('-o', '--out-dir', type=str, default='out', help='Directory where to save the json file dump')
+    args.add_argument('-o', '--output-file', type=str, default='out', help='Directory where to save the final csv file dump')
     args.add_argument('-c', '--convert-only', type=str, help='Directory to dump file to convert to csv')
     args.add_argument('-d', '--dump-only', action='store_true', help='flag to only export data from elasticserach (no conversion)')
 
