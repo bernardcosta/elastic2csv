@@ -61,7 +61,6 @@ class Elastic2csv:
         bar = progressbar.ProgressBar(widgets=widgets, maxval=max_hits).start()
 
         with open(self.outfile, 'a+') as out:
-            count = 1
             out.write("[")
             while True:
                 res = self.connection.search(index=str(self.args.index)+"-*", query=self.query["query"], aggs=self.query["aggs"])
@@ -78,10 +77,6 @@ class Elastic2csv:
 
                 after_dict = {"split":res['aggregations'][split_key]['after_key']['split']}
                 self.query['aggs'][split_key]["composite"]["after"] = after_dict
-                count += 1
-                log.info(f'Batch: {count} {total_hits} docs')
-
-        self.to_csv()
 
 
     def load_request_file(self):
@@ -92,8 +87,12 @@ class Elastic2csv:
 
         log.info("  Loaded request body file.")
 
-    def to_csv():
-        data = json.load(open(self.outfile, 'r'))
+    def to_csv(file=None):
+        if file is not None
+            data = json.load(open(file, 'r'))
+        else:
+            data = json.load(open(self.outfile, 'r'))
+
         data = utils.flatten_json_list(data)
 
         with open(f"FinalOutput{str(datetime.now()).replace(' ','')}.csv","w") as f:

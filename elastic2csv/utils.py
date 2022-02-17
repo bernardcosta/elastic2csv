@@ -20,10 +20,10 @@ def flatten_json_list(list):
 
 
 
-def find_key(self, d):
+def find_key(d):
     for k,v in d.items():
         if isinstance(v, dict):
-            p = self.find_key(v)
+            p = find_key(v)
             if k == 'composite':
                 return [k]
             else:

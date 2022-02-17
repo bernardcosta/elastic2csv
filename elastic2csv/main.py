@@ -25,12 +25,22 @@ if __name__ == "__main__":
     args.add_argument('-su', '--server-username', type=str, help='if url is from remote ssh enter username. You need ssh access credentials for this to work')
     args.add_argument('-sh', '--server-host', type=str, help='if url is from remote ssh enter host. You need ssh access creddential for this to work')
     args.add_argument('-o', '--out-dir', type=str, default='out', help='Directory where to save the json file dump')
+    args.add_argument('-c', '--convert-only', type=str, help='Directory to dump file to convert to csv')
+    args.add_argument('-d', '--dump-only', action='store_true', help='flag to only export data from elasticserach (no conversion)')
 
     es = elastic2csv.Elastic2csv(args.parse_args())
     try:
 
-        es.connect()
-        es.search()
+        if args.convert_only and args.dump_only:
+            raise Exception("Cannot assign both -c and -d flags at the same time")
+
+        if not args.convert_only:
+            es.connect()
+            es.search()
+            if not args.dump_only:
+                es.to_csv()
+        else:
+            es.to_csv(args.convert_only)
 
     except Exception as e:
         log.exception("main.py")
