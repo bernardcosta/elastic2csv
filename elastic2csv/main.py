@@ -1,14 +1,8 @@
-#!/usr/bin/env python
-
-from core import compositeexport as ce
-from core import elastic2csv
-from dotenv import load_dotenv
-import logging
-import sys
-import os, shutil
-import traceback
 import argparse
-log = logging.getLogger(__name__)
+import logging
+from dotenv import load_dotenv
+from core import elastic2csv
+LOG = logging.getLogger(__name__)
 
 
 if __name__ == "__main__":
@@ -28,20 +22,20 @@ if __name__ == "__main__":
     args.add_argument('-c', '--convert-only', type=str, help='Directory to dump file to convert to csv')
     args.add_argument('-d', '--dump-only', action='store_true', help='flag to only export data from elasticserach (no conversion)')
 
-    arguments = args.parse_args()
-    es = elastic2csv.Elastic2csv(arguments)
+    ARGUMENTS = args.parse_args()
+    ES = elastic2csv.Elastic2csv(ARGUMENTS)
     try:
 
-        if arguments.convert_only and arguments.dump_only:
+        if ARGUMENTS.convert_only and ARGUMENTS.dump_only:
             raise Exception("Cannot assign both -c and -d flags at the same time")
 
-        if not arguments.convert_only:
-            es.connect()
-            es.search()
-            if not arguments.dump_only:
-                es.to_csv()
+        if not ARGUMENTS.convert_only:
+            ES.connect()
+            ES.export()
+            if not ARGUMENTS.dump_only:
+                ES.to_csv()
         else:
-            es.to_csv(file=arguments.convert_only)
+            ES.to_csv(file=ARGUMENTS.convert_only)
 
     except Exception as e:
-        log.exception("main.py")
+        LOG.exception("main.py")

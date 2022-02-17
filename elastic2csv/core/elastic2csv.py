@@ -3,7 +3,7 @@
 from elasticsearch import Elasticsearch
 import progressbar
 import logging
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 import json
 import os
 from datetime import datetime
@@ -28,21 +28,20 @@ class Elastic2csv:
 
     def port_forward(self):
         command = f'ssh -f -N -q -L "9201:{self.args.url}" {self.args.server_username}@{self.args.server_host}'
-        log.info(f'Port forwarding {command}')
+        LOG.info('Port forwarding %s', command)
         os.system("kill $( ps aux | grep '[9]201:' | awk '{print $2}' )")
         os.system(command)
         self.args.url="http://localhost:9201"
-        log.info(f"New Elasticsearch URL {self.args.url}")
+        LOG.info("New Elasticsearch URL %s", self.args.url)
 
 
-    #TODO: retry connections
+    # todo retry connections
     def connect(self):
-        log.info(f"Connecting to elasticsearch: {self.args.url}")
-        es = Elasticsearch(self.args.url, timeout=self.timeout)
-        self.connection = es
+        LOG.info("Connecting to elasticsearch: %s ",self.args.url)
+        self.connection = Elasticsearch(self.args.url, timeout=self.timeout)
 
-    def search(self):
-        log.info("Searching query...")
+    def export(self):
+        LOG.info("Searching query...")
         total_hits = 0
         self.load_request_file()
         split_key = utils.find_key(self.query)[-2]
@@ -58,9 +57,9 @@ class Elastic2csv:
                        progressbar.ETA(), '] [',
                        progressbar.FileTransferSpeed(unit='docs'), ']'
                        ]
-        bar = progressbar.ProgressBar(widgets=widgets, maxval=max_hits).start()
+        pbar = progressbar.ProgressBar(widgets=widgets, maxval=max_hits).start()
 
-        with open(self.outfile, 'a+') as out:
+        with open(self.outfile, 'a+', encoding='UTF-8') as out:
             out.write("[")
             while True:
                 res = self.connection.search(index=str(self.args.index)+"-*", query=self.query["query"], aggs=self.query["aggs"])
@@ -69,7 +68,7 @@ class Elastic2csv:
                         out.write(",\n")
                     total_hits += 1
                     out.write(json.dumps(hit))
-                    bar.update(total_hits)
+                    pbar.update(total_hits)
 
                 if "after_key" not in res['aggregations'][split_key]:
                     out.write("]")
@@ -82,20 +81,20 @@ class Elastic2csv:
     def load_request_file(self):
         with open(str(self.args.request_file), encoding='utf-8') as f:
             request = json.loads(f.read())
-            log.info(f'Loading {self.args.request_file} - Size {os.path.getsize(self.args.request_file) / 1000}Kb')
+            LOG.info(f'Loading {self.args.request_file} - Size {os.path.getsize(self.args.request_file) / 1000}Kb')
             self.query = request
 
-        log.info("  Loaded request body file.")
+        LOG.info("  Loaded request body file.")
 
     def to_csv(self, file=None):
         if file is not None:
-            data = json.load(open(file, 'r'))
+            data = json.load(open(file, 'r', encoding='UTF-8'))
         else:
-            data = json.load(open(self.outfile, 'r'))
+            data = json.load(open(self.outfile, 'r', encoding='UTF-8'))
 
         data = utils.flatten_json_list(data)
 
-        with open(f"FinalOutput{str(datetime.now()).replace(' ','')}.csv","w") as f:
+        with open(f"FinalOutput{str(datetime.now()).replace(' ','')}.csv","w", encoding='UTF-8') as f:
             cw = csv.DictWriter(f, c.COLUMNS, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, extrasaction='ignore')
             cw.writeheader()
             cw.writerows(data)
