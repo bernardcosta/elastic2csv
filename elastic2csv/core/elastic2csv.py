@@ -88,13 +88,16 @@ class Elastic2csv:
 
     def to_csv(self, file=None):
         if file is not None:
-            data = json.load(open(file, 'r', encoding='UTF-8'))
-        else:
-            data = json.load(open(self.outfile, 'r', encoding='UTF-8'))
+            self.outfile=file
 
+        data = json.load(open(self.outfile, 'r', encoding='UTF-8'))
         data = utils.flatten_json_list(data)
 
-        with open(f"FinalOutput{str(datetime.now()).replace(' ','')}.csv","w", encoding='UTF-8') as f:
+        csv_file = f"FinalOutput{str(datetime.now()).replace(' ','')}.csv"
+
+        with open(csv_file,"w", encoding='UTF-8') as f:
             cw = csv.DictWriter(f, c.COLUMNS, delimiter=',', quotechar='|', quoting=csv.QUOTE_MINIMAL, extrasaction='ignore')
             cw.writeheader()
             cw.writerows(data)
+
+        os.system(f"awk -F , 'NF == 3' < {csv_file} > out.tmp && mv out.tmp {csv_file}")
