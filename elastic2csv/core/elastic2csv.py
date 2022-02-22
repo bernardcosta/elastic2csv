@@ -59,7 +59,7 @@ class Elastic2csv:
                        progressbar.ETA(), '] [',
                        progressbar.FileTransferSpeed(unit='docs'), ']'
                        ]
-        pbar = progressbar.ProgressBar(widgets=widgets, maxval=max_hits+1000).start()
+        pbar = progressbar.ProgressBar(widgets=widgets, maxval=max_hits).start()
 
         with open(self.outfile, 'a+', encoding='UTF-8') as out:
             out.write("[")
@@ -70,7 +70,7 @@ class Elastic2csv:
                         out.write(",\n")
 
                     out.write(json.dumps(hit))
-                    if total_hits <= maxval:
+                    if total_hits <= max_hits:
                         pbar.update(total_hits)
                     total_hits += 1
 
